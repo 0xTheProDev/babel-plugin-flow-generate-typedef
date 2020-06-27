@@ -1,5 +1,8 @@
 {
   "plugins": [
-    ["../lib"]
-  ]
+    "../lib"
+  ],
+  "parserOpts": {
+    "plugins": ["jsx", "flow"]
+  }
 }

@@ -1,24 +1,12 @@
+import transformClassDeclaration from './transformClassDeclaration';
 import transformFunctionStatement from './transformFunctionStatement';
 import transformProgramDefinition from './transformProgramDefinition';
 
 export default function transformFlowDefinitions(t) {
   return {
-    Program(path, state) {
-      const { comments } = path.parent;
-
-      // Transform only if there's a comment with @flow
-      const flowComment = comments.find(comment => comment.value.trim() === '@flow');
-      if (!flowComment) {
-        return;
-      }
-
-      // Ensure avoiding Stack Overflow
-      if (!path.node.body || t.isDeclareModule(path.node.body[0])) {
-        return;
-      }
-
-      const programDefinition = transformProgramDefinition(t, path.node, state);
-      path.replaceWith(programDefinition);
+    ClassDeclaration(path) {
+      const declareClass = transformClassDeclaration(t, path.node);
+      path.replaceWith(declareClass);
     },
 
     ExportDefaultDeclaration(path) {
@@ -36,6 +24,24 @@ export default function transformFlowDefinitions(t) {
         const exportDeclaration = transformFunctionStatement(t, path.node.declaration);
         path.replaceWith(exportDeclaration);
       }
+    },
+
+    Program(path, state) {
+      const { comments } = path.parent;
+
+      // Transform only if there's a comment with @flow
+      const flowComment = comments.find(comment => comment.value.trim() === '@flow');
+      if (!flowComment) {
+        return;
+      }
+
+      // Ensure avoiding Stack Overflow
+      if (!path.node.body || t.isDeclareModule(path.node.body[0])) {
+        return;
+      }
+
+      const programDefinition = transformProgramDefinition(t, path.node, state);
+      path.replaceWith(programDefinition);
     },
 
     TypeAlias(path) {
