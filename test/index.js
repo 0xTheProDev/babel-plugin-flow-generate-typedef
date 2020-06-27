@@ -8,10 +8,10 @@ function trim(str) {
   return str.replace(/^\s+|\s+$/, '');
 }
 
-describe('Add a description for the plugin here', () => {
+describe('Add a description for the plugin here', function() {
   const fixturesDir = path.join(__dirname, 'fixtures');
   fs.readdirSync(fixturesDir).map((caseName) => {
-    it(`should ${caseName.split('-').join(' ')}`, () => {
+    it(`should ${caseName.split('-').join(' ')}`, function() {
       const fixtureDir = path.join(fixturesDir, caseName);
       const actualPath = path.join(fixtureDir, 'actual.js');
       const actual = transformFileSync(actualPath).code;
