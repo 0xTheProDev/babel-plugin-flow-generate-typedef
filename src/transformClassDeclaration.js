@@ -1,39 +1,20 @@
+import transformExtendsNotation from './transformExtendsNotation';
+import transformClassProperties from './transformClassProperties';
+
 export default function transformClassDeclaration(t, classDefinition) {
   const className = classDefinition.id.name;
   const classIdentifier = t.identifier(className);
+  const classProperties = classDefinition.body.body;
 
-  const objectTypeProperties = classDefinition.body.body.map(function (classProperty) {
-    if (t.isClassProperty(classProperty)) {
-      const objectTypeProperty = t.objectTypeProperty(
-        classProperty.key,
-        classProperty.typeAnnotation.typeAnnotation,
-        classProperty.variance
-      );
-      objectTypeProperty.kind = 'init';
-      objectTypeProperty.method = false;
-      objectTypeProperty.optional = false;
-      objectTypeProperty.static = classProperty.static;
-      return objectTypeProperty;
-    }
-
-    const returnType = classProperty.returnType ? classProperty.returnType.typeAnnotation : t.anyTypeAnnotation();
-    const typeAnnotation = t.functionTypeAnnotation(
-      null,
-      classProperty.params,
-      null,
-      returnType
-    );
-    const objectTypeProperty = t.objectTypeProperty(
-      classProperty.key,
-      typeAnnotation,
-      classProperty.variance
-    );
-    objectTypeProperty.kind = 'init';
-    objectTypeProperty.optional = false;
-    objectTypeProperty.static = classProperty.static;
-    return objectTypeProperty;
-  });
-
+  // Create objectProperties map from classProperties and classMethods
+  const objectTypeProperties = transformClassProperties(t, classProperties);
   const objectTypeAnnotation = t.objectTypeAnnotation(objectTypeProperties);
-  return t.declareClass(classIdentifier, classDefinition.typeParameters, [], objectTypeAnnotation);
+
+  // Create inheritance map from super class declaration
+  const interfaceExtends = t.interfaceExtends(
+    transformExtendsNotation(t, classDefinition.superClass),
+    classDefinition.superTypeParameters
+  );
+
+  return t.declareClass(classIdentifier, classDefinition.typeParameters, [interfaceExtends], objectTypeAnnotation);
 }
