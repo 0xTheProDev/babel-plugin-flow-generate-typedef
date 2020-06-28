@@ -7,7 +7,14 @@ export default function transformClassDeclaration(t, classDefinition) {
   const classProperties = classDefinition.body.body;
 
   // Create objectProperties map from classProperties and classMethods
-  const objectTypeProperties = transformClassProperties(t, classProperties);
+  const objectTypeProperties = transformClassProperties(
+    t,
+    classProperties,
+    {
+      identifier: classIdentifier,
+      typeParameters: classDefinition.typeParameters || {},
+    }
+  );
   const objectTypeAnnotation = t.objectTypeAnnotation(objectTypeProperties);
 
   // Create inheritance map from super class declaration
