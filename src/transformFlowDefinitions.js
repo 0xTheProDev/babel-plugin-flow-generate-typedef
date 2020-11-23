@@ -1,8 +1,11 @@
 import transformClassDeclaration from './transformClassDeclaration';
 import transformFunctionStatement from './transformFunctionStatement';
 import transformProgramDefinition from './transformProgramDefinition';
+import transformVariableDeclaration from './transformVariableDeclaration';
 
 export default function transformFlowDefinitions(t) {
+  t.assertVersion(7);
+
   return {
     ClassDeclaration(path) {
       const declareClass = transformClassDeclaration(t, path.node);
@@ -22,6 +25,9 @@ export default function transformFlowDefinitions(t) {
       // transform function into declare statement
       if (t.isFunctionDeclaration(path.node.declaration)) {
         const exportDeclaration = transformFunctionStatement(t, path.node.declaration);
+        path.replaceWith(exportDeclaration);
+      } else if (t.isVariableDeclaration(path.node.declaration)) {
+        const exportDeclaration = transformVariableDeclaration(t, path.node.declaration);
         path.replaceWith(exportDeclaration);
       }
     },
