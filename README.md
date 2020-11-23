@@ -1,64 +1,75 @@
-Read babel plugin handbook -> https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md
+# Features
 
-Try http://astexplorer.net/#/Pcw9baefXI for a visual understanding.
+### 1. Persist type information
+All Type defintion (and interface as well) should persist on output code as an exported value.
+**Better**: Add Treeshaking to remove unused type/interface information.
 
-# babel-plugin-boilerplate
+#### Input
+```typescript
+export type Person {
+  name: string,
+  age: number,
+}
 
-Add a description for the plugin here
-
-## Example
-
-**In**
-
-```js
-let tips = [
-  "Paste or drop some JavaScript here and explore the syntax tree created by chosen parser.",
-  "You can use all the cool new features from ES6 and even more. Enjoy!"
-];
-
-function printTips() {
-  tips.forEach((tip, i) => console.log(`Tip ${i}:` + tip));
+type Car {
+  regno: string,
+  speed: number,
 }
 ```
 
-**Out**
+#### Output
+```typescript
+export type Person {
+  name: string,
+  age: number,
+}
 
-```js
-let spit = ["Paste or drop some JavaScript here and explore the syntax tree created by chosen parser.", "You can use all the cool new features from ES6 and even more. Enjoy!"];
-
-function spiTtnirp() {
-  spit.hcaErof((pit, i) => elosnoc.gol(`Tip ${ i }:` + pit));
+export type Car {
+  regno: string,
+  speed: number,
 }
 ```
 
-## Installation
+### 2. Convert Function Defintion to Declaration
+Convert exported function definitions to declarations while specifying input param types and output type.
 
-```sh
-$ npm install babel-plugin-boilerplate
-```
-
-## Usage
-
-### Via `.babelrc` (Recommended)
-
-**.babelrc**
-
-```json
-{
-  "plugins": ["boilerplate"]
+#### Input
+```typescript
+export function addTwoNumber(a: number, b: number): number {
+  return a + b;
 }
 ```
 
-### Via CLI
-
-```sh
-$ babel --plugins boilerplate script.js
+#### Output
+```typescript
+declare function addTwoNumber(a: number, b: number): number;
 ```
 
-### Via Node API
+### 3. Convert Class Definition to Interface Declaration
+Convert Classes to Interfaces iterating over `constructor` and/or caret expression, and, other public methods.
 
-```javascript
-require("babel-core").transform("code", {
-  plugins: ["boilerplate"]
-});
+**Better**: Avoid publishing life-cycle methods for `React.Component` child.
+
+#### Input
+```typescript
+export class DialogWidget extends React.Component<IncomingProps, InternalState> {
+  componentDidMount() {
+    window.title = 'Home Page';
+  }
+
+  getCurrentTime(): number {
+    return Date.now();
+  }
+
+  render() {
+    return (<h1>Hello World</h1>);
+  }
+}
+```
+
+#### Output
+```typescript
+export interface DialogWidget extends React.Component<IncomingProps, InternalState> {
+  getCurrentTime(): number;
+}
 ```
