@@ -14,7 +14,8 @@ export default function transformFunctionStatement(t, functionStatement) {
       optional = true;
     }
 
-    const functionTypeParam = t.functionTypeParam(identifier, identifier.typeAnnotation.typeAnnotation);
+    const paramTypeAnnotation = identifier.typeAnnotation ? identifier.typeAnnotation.typeAnnotation : t.anyTypeAnnotation();
+    const functionTypeParam = t.functionTypeParam(identifier, paramTypeAnnotation);
     functionTypeParam.optional = optional;
 
     return functionTypeParam;
