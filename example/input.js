@@ -14,14 +14,16 @@ export function addTwoNumber(a: number = 0, b: number): number {
 class DialogWidget<T> extends React.Component<DialogWidgetProps, DialogWidgetState<T>> {
   test: boolean;
 
-  // constructor() {}
+  constructor() {
+    this.test = true;
+  }
 
   componentDidMount(): void {
     emitter.on('event', this.listener);
   }
 
-  getCode(): string {
-    return 'a';
+  getValue() {
+    return this.test;
   }
 
   render() {
