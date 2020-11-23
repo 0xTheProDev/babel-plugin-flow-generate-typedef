@@ -11,7 +11,7 @@ export function addTwoNumber(a: number = 0, b: number): number {
   return a + b;
 }
 
-class ABC<T> extends React.Component.A<Test> {
+class DialogWidget<T> extends React.Component<DialogWidgetProps, DialogWidgetState<T>> {
   test: boolean;
 
   // constructor() {}
