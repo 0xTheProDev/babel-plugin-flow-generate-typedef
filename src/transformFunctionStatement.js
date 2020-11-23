@@ -28,6 +28,7 @@ export default function transformFunctionStatement(t, functionStatement) {
   const functionDeclarationIdentifer = t.identifier(functionStatement.id.name);
   functionDeclarationIdentifer.typeAnnotation = t.typeAnnotation(functionTypeAnnotation);
 
-  // Return newly created function declaration
-  return t.declareFunction(functionDeclarationIdentifer);
+  // Return newly created function declaration export statement
+  const functionDeclaration = t.declareFunction(functionDeclarationIdentifer);
+  return t.declareExportDeclaration(functionDeclaration, null, null);
 }
