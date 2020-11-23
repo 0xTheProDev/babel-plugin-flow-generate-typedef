@@ -1,9 +1,12 @@
 import transformFunctionStatement from './transformFunctionStatement';
-import transformTypeAlias from './transformTypeAlias';
 
 export default function ({ types: t }) {
   return {
     visitor: {
+      Program(path, state) {
+        console.log(state);
+      },
+
       ExportDefaultDeclaration(path) {
         // transform function into declare statement
         if (t.isFunctionDeclaration(path.node.declaration)) {
@@ -23,7 +26,7 @@ export default function ({ types: t }) {
 
       TypeAlias(path) {
         // Apply only if not already exported
-        if (path.parent.type === 'ExportNamedDeclaration') {
+        if (t.isExportNamedDeclaration(path.parent)) {
           return;
         }
 
