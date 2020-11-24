@@ -6,7 +6,7 @@ import transformFunctionStatement from './transformFunctionStatement';
  */
 export default function transformVariableDefinitions(t, variableStatement) {
   if (variableStatement.kind !== 'const') {
-    return t.emptyStatement();
+    return t.noop();
   }
 
   const declaration = variableStatement.declarations[0];
@@ -15,11 +15,36 @@ export default function transformVariableDefinitions(t, variableStatement) {
     return variableStatement;
   }
 
-  if (t.isFunctionExpression(declaration.init)) {
-    const functionStatement = t.functionDeclaration(declaration.id, declaration.init.params, declaration.init.body, declaration.init.generator, declaration.init.async);
+  const declarationExpression = declaration.init;
+
+  if (t.isFunctionExpression(declarationExpression)) {
+    const functionStatement = t.functionDeclaration(
+      declaration.id,
+      declarationExpression.params,
+      declarationExpression.body,
+      declarationExpression.generator,
+      declarationExpression.async
+    );
     functionStatement.returnType = declaration.init.returnType;
     return transformFunctionStatement(t, functionStatement);
   }
 
-  return t.emptyStatement();
+  if (t.isArrowFunctionExpression(declarationExpression)) {
+    let functionBody = declarationExpression.body;
+    if (t.isExpression(functionBody)) {
+      functionBody = t.blockStatement([t.expressionStatement(functionBody)]);
+    }
+
+    const functionStatement = t.functionDeclaration(
+      declaration.id,
+      declarationExpression.params,
+      functionBody,
+      declarationExpression.generator,
+      declarationExpression.async
+    );
+    functionStatement.returnType = declaration.init.returnType;
+    return transformFunctionStatement(t, functionStatement);
+  }
+
+  return t.noop();
 }
